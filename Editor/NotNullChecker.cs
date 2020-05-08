@@ -11,7 +11,7 @@ namespace UniNotNullChecker
 	/// Inspector で参照が設定されていない NotNull なパラメータが存在したら Unity を再生できなくするエディタ拡張
 	/// </summary>
 	[InitializeOnLoad]
-	public static class NotNullChecker
+	internal static class NotNullChecker
 	{
 		//================================================================================
 		// クラス
@@ -19,7 +19,7 @@ namespace UniNotNullChecker
 		/// <summary>
 		/// null なパラメータの情報を管理するクラス
 		/// </summary>
-		public sealed class NullData
+		internal sealed class NullData
 		{
 			/// <summary>
 			/// 参照が設定されていないパラメータを所持するコンポーネント
@@ -27,9 +27,14 @@ namespace UniNotNullChecker
 			public Component Component { get; }
 
 			/// <summary>
+			/// 参照が設定されていないパラメータを所持するゲームオブジェクトの名前
+			/// </summary>
+			public string GameObjectName { get; }
+
+			/// <summary>
 			/// 参照が設定されていないパラメータを所持するゲームオブジェクトのルートからのパス
 			/// </summary>
-			public string RootPath { get; }
+			public string GameObjectRootPath { get; }
 
 			/// <summary>
 			/// 参照が設定されていないパラメータを所持するコンポーネントの名前
@@ -44,25 +49,19 @@ namespace UniNotNullChecker
 			public NullData
 			(
 				Component component,
-				string    rootPath,
+				string    gameObjectName,
+				string    gameObjectRootPath,
 				string    componentName,
 				string    fieldName
 			)
 			{
-				Component     = component;
-				RootPath      = rootPath;
-				ComponentName = componentName;
-				FieldName     = fieldName;
+				Component      = component;
+				GameObjectName = gameObjectName;
+				GameObjectRootPath       = gameObjectRootPath;
+				ComponentName  = componentName;
+				FieldName      = fieldName;
 			}
 		}
-
-		//================================================================================
-		// イベント(static)
-		//================================================================================
-		/// <summary>
-		/// 参照が設定されていない NotNull なパラメータの情報をログ出力する時に呼び出されます
-		/// </summary>
-		public static event Action<NullData> OnLog;
 
 		//================================================================================
 		// 関数(static)
@@ -82,20 +81,25 @@ namespace UniNotNullChecker
 		{
 			if ( state != PlayModeStateChange.ExitingEditMode ) return;
 
+			var settings = NotNullCheckerSettings.LoadFromEditorPrefs();
+
+			if ( !settings.IsEnable ) return;
+
 			var list = Validate().ToArray();
 
 			if ( list.Length <= 0 ) return;
 
+			var logFormat = settings.LogFormat;
+
 			foreach ( var n in list )
 			{
-				if ( OnLog != null )
-				{
-					OnLog( n );
-				}
-				else
-				{
-					Debug.LogError( $"参照が設定されていません：{n.RootPath}, {n.ComponentName}, {n.FieldName}", n.Component );
-				}
+				var message = logFormat;
+				message = message.Replace( "[GameObjectName]", n.GameObjectName );
+				message = message.Replace( "[GameObjectRootPath]", n.GameObjectRootPath );
+				message = message.Replace( "[ComponentName]", n.ComponentName );
+				message = message.Replace( "[FieldName]", n.FieldName );
+
+				Debug.LogError( message, n.Component );
 			}
 
 			EditorApplication.isPlaying = false;
@@ -139,7 +143,8 @@ namespace UniNotNullChecker
 						var data = new NullData
 						(
 							component: component,
-							rootPath: component.gameObject.GetRootPath(),
+							gameObjectName: component.gameObject.name,
+							gameObjectRootPath: component.gameObject.GetRootPath(),
 							componentName: component.GetType().Name,
 							fieldName: field.Name
 						);
