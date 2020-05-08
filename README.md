@@ -19,24 +19,13 @@ public class Test : MonoBehaviour
 
 ![Image (16)](https://user-images.githubusercontent.com/6134875/81050795-95d63380-8efb-11ea-92c0-12ae2874f184.gif)
 
-## ログ出力のカスタマイズ
+## 設定
 
-```cs
-using UniNotNullChecker;
-using UnityEditor;
-using UnityEngine;
+![2020-05-08_205620](https://user-images.githubusercontent.com/6134875/81403478-7135c200-916e-11ea-8d62-8b43b898f8fb.png)
 
-[InitializeOnLoad]
-public static class Example
-{
-    static Example()
-    {
-        NotNullChecker.OnLog += data =>
-        {
-            Debug.LogError( $"参照が設定されていません：{data.RootPath}, {data.ComponentName}, {data.FieldName}", data.Component );
-        };
-    }
-}
-```
+Preferences から設定を変更できます  
 
-* 参照が見つからなかった場合に出力されるログはカスタマイズできます  
+|項目|内容|
+|:--|:--|
+|Enabled|有効かどうか（デフォルトは OFF）|
+|Log Format|エラーログのフォーマット|
