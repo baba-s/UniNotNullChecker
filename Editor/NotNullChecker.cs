@@ -122,6 +122,8 @@ namespace UniNotNullChecker
 
 				foreach ( var component in components )
 				{
+					if ( component == null ) continue;
+
 					var type   = component.GetType();
 					var fields = type.GetFields( BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance );
 
