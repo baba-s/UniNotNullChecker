@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace UniNotNullChecker
+namespace Kogane.Internal
 {
 	/// <summary>
 	/// 設定を管理するクラス

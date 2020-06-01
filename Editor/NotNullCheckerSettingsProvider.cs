@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace UniNotNullChecker
+namespace Kogane.Internal
 {
 	/// <summary>
 	/// Preferences における設定画面を管理するクラス
