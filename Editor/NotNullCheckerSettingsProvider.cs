@@ -63,7 +63,7 @@ namespace Kogane.Internal
 		[SettingsProvider]
 		private static SettingsProvider Create()
 		{
-			var path     = "Preferences/UniNotNullChecker";
+			var path     = "Kogane/UniNotNullChecker";
 			var provider = new NotNullCheckerSettingsProvider( path, SettingsScope.User );
 
 			return provider;
